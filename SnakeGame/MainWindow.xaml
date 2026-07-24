@@ -52,7 +52,8 @@
         <StackPanel Grid.Row="3"
                     HorizontalAlignment="Center"
                     Margin="0,14,0,0">
-            <TextBlock Text="Khung giao diện ban đầu"
+            <TextBlock x:Name="MessageText"
+                       Text="Nhấn nút Bắt đầu để tạo con rắn"
                        Foreground="White"
                        FontSize="17"
                        HorizontalAlignment="Center"
@@ -63,7 +64,7 @@
                     Height="42"
                     FontSize="17"
                     FontWeight="SemiBold"
-                    IsEnabled="False" />
+                    Click="StartButton_Click" />
         </StackPanel>
     </Grid>
 </Window>
