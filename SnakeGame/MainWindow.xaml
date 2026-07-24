@@ -6,7 +6,9 @@
         Height="720"
         ResizeMode="NoResize"
         WindowStartupLocation="CenterScreen"
-        Background="#20252B">
+        Background="#20252B"
+        PreviewKeyDown="Window_PreviewKeyDown"
+        Closed="Window_Closed">
 
     <Grid Margin="20">
         <Grid.RowDefinitions>
@@ -53,7 +55,7 @@
                     HorizontalAlignment="Center"
                     Margin="0,14,0,0">
             <TextBlock x:Name="MessageText"
-                       Text="Nhấn nút Bắt đầu để tạo con rắn"
+                       Text="Nhấn nút Bắt đầu để chơi"
                        Foreground="White"
                        FontSize="17"
                        HorizontalAlignment="Center"
