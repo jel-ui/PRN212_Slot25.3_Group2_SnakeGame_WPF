@@ -3,71 +3,166 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Rắn săn mồi"
         Width="670"
-        Height="720"
+        Height="780"
         ResizeMode="NoResize"
         WindowStartupLocation="CenterScreen"
         Background="#20252B"
         PreviewKeyDown="Window_PreviewKeyDown"
         Closed="Window_Closed">
 
-    <Grid Margin="20">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
+    <Grid>
+        <!-- Màn hình menu -->
+        <Grid x:Name="MenuPanel" Margin="40">
+            <Border Background="#2D343C"
+                    CornerRadius="18"
+                    Padding="50"
+                    VerticalAlignment="Center">
+                <StackPanel>
+                    <TextBlock Text="RẮN SĂN MỒI"
+                               Foreground="#71D368"
+                               FontSize="42"
+                               FontWeight="Bold"
+                               HorizontalAlignment="Center" />
 
-        <TextBlock Grid.Row="0"
-                   Text="RẮN SĂN MỒI"
-                   Foreground="#71D368"
-                   FontSize="34"
-                   FontWeight="Bold"
-                   HorizontalAlignment="Center"
-                   Margin="0,0,0,12" />
+                    <TextBlock Text="Ăn thức ăn, tăng điểm và tránh va chạm"
+                               Foreground="#C8D0D8"
+                               FontSize="17"
+                               HorizontalAlignment="Center"
+                               Margin="0,10,0,35" />
 
-        <Border Grid.Row="1"
-                Background="#2D343C"
-                CornerRadius="8"
-                Padding="16,10"
-                Margin="0,0,0,12">
-            <TextBlock x:Name="ScoreText"
-                       Text="Điểm: 0"
+                    <TextBlock Text="Chọn tốc độ:"
+                               Foreground="White"
+                               FontSize="18"
+                               Margin="0,0,0,8" />
+
+                    <ComboBox x:Name="SpeedComboBox"
+                              Height="42"
+                              FontSize="17"
+                              SelectedIndex="1"
+                              Margin="0,0,0,30">
+                        <ComboBoxItem Content="Chậm" Tag="180" />
+                        <ComboBoxItem Content="Bình thường" Tag="130" />
+                        <ComboBoxItem Content="Nhanh" Tag="85" />
+                    </ComboBox>
+
+                    <Button Content="VÀO GAME"
+                            Height="52"
+                            FontSize="19"
+                            FontWeight="Bold"
+                            Click="EnterGameButton_Click" />
+
+                    <TextBlock Text="Điều khiển bằng phím mũi tên hoặc W, A, S, D"
+                               Foreground="#AEB7C0"
+                               FontSize="14"
+                               TextAlignment="Center"
+                               Margin="0,28,0,0" />
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <!-- Màn hình chơi game -->
+        <Grid x:Name="GamePanel"
+              Margin="20"
+              Visibility="Collapsed">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <TextBlock Grid.Row="0"
+                       Text="RẮN SĂN MỒI"
                        Foreground="White"
-                       FontSize="18"
-                       FontWeight="SemiBold" />
-        </Border>
+                       FontSize="30"
+                       FontWeight="Bold"
+                       HorizontalAlignment="Center"
+                       Margin="0,0,0,12" />
 
-        <Border Grid.Row="2"
-                Width="600"
-                Height="500"
-                BorderBrush="#65717E"
-                BorderThickness="2"
-                Background="#111417"
-                HorizontalAlignment="Center">
-            <Canvas x:Name="GameCanvas"
+            <Border Grid.Row="1"
+                    Background="#2D343C"
+                    CornerRadius="8"
+                    Padding="16,10"
+                    Margin="0,0,0,12">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock x:Name="ScoreText"
+                               Grid.Column="0"
+                               Text="Điểm: 0"
+                               Foreground="White"
+                               FontSize="18"
+                               FontWeight="SemiBold" />
+
+                    <TextBlock x:Name="SpeedText"
+                               Grid.Column="1"
+                               Text="Tốc độ: Bình thường"
+                               Foreground="#8FD694"
+                               FontSize="16"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center" />
+
+                    <TextBlock x:Name="HighScoreText"
+                               Grid.Column="2"
+                               Text="Điểm cao: 0"
+                               Foreground="#FFD166"
+                               FontSize="18"
+                               FontWeight="SemiBold"
+                               HorizontalAlignment="Right" />
+                </Grid>
+            </Border>
+
+            <Border Grid.Row="2"
                     Width="600"
                     Height="500"
-                    ClipToBounds="True" />
-        </Border>
+                    BorderBrush="#65717E"
+                    BorderThickness="2"
+                    Background="#111417"
+                    HorizontalAlignment="Center">
+                <Canvas x:Name="GameCanvas"
+                        Width="600"
+                        Height="500"
+                        ClipToBounds="True" />
+            </Border>
 
-        <StackPanel Grid.Row="3"
-                    HorizontalAlignment="Center"
-                    Margin="0,14,0,0">
-            <TextBlock x:Name="MessageText"
-                       Text="Nhấn nút Bắt đầu để chơi"
-                       Foreground="White"
-                       FontSize="17"
-                       HorizontalAlignment="Center"
-                       Margin="0,0,0,10" />
+            <StackPanel Grid.Row="3"
+                        HorizontalAlignment="Center"
+                        Margin="0,14,0,0">
+                <TextBlock x:Name="MessageText"
+                           Text="Nhấn nút Bắt đầu để chơi"
+                           Foreground="White"
+                           FontSize="17"
+                           HorizontalAlignment="Center"
+                           Margin="0,0,0,10" />
 
-            <Button x:Name="StartButton"
-                    Content="Bắt đầu"
-                    Width="150"
-                    Height="42"
-                    FontSize="17"
-                    FontWeight="SemiBold"
-                    Click="StartButton_Click" />
-        </StackPanel>
+                <StackPanel Orientation="Horizontal"
+                            HorizontalAlignment="Center">
+                    <Button x:Name="StartButton"
+                            Content="Bắt đầu"
+                            Width="150"
+                            Height="42"
+                            FontSize="17"
+                            FontWeight="SemiBold"
+                            Click="StartButton_Click" />
+
+                    <Button Content="Về menu"
+                            Width="120"
+                            Height="42"
+                            FontSize="16"
+                            Margin="12,0,0,0"
+                            Click="BackToMenuButton_Click" />
+                </StackPanel>
+
+                <TextBlock Text="Điều khiển: phím mũi tên hoặc W, A, S, D"
+                           Foreground="#B8C0C8"
+                           FontSize="14"
+                           HorizontalAlignment="Center"
+                           Margin="0,10,0,0" />
+            </StackPanel>
+        </Grid>
     </Grid>
 </Window>
