@@ -39,11 +39,18 @@
                               Height="42"
                               FontSize="17"
                               SelectedIndex="1"
-                              Margin="0,0,0,30">
+                              Margin="0,0,0,20">
                         <ComboBoxItem Content="Chậm" Tag="180" />
                         <ComboBoxItem Content="Bình thường" Tag="130" />
                         <ComboBoxItem Content="Nhanh" Tag="85" />
                     </ComboBox>
+
+                    <CheckBox x:Name="MusicCheckBox"
+                              Content="Bật nhạc nền"
+                              IsChecked="True"
+                              Foreground="White"
+                              FontSize="18"
+                              Margin="0,0,0,30" />
 
                     <Button Content="VÀO GAME"
                             Height="52"

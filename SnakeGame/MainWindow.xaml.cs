@@ -28,6 +28,7 @@ public partial class MainWindow : Window
     private bool isGameRunning;
 
     private readonly string highScoreFilePath;
+    private readonly BackgroundMusicPlayer backgroundMusicPlayer;
 
     public MainWindow()
     {
@@ -38,6 +39,7 @@ public partial class MainWindow : Window
 
         string gameDataFolder = Path.Combine(applicationDataFolder, "SimpleSnakeGame");
         highScoreFilePath = Path.Combine(gameDataFolder, "highscore.txt");
+        backgroundMusicPlayer = new BackgroundMusicPlayer(gameDataFolder);
 
         gameTimer.Interval = TimeSpan.FromMilliseconds(130);
         gameTimer.Tick += GameTimer_Tick;
@@ -54,6 +56,11 @@ public partial class MainWindow : Window
         MenuPanel.Visibility = Visibility.Collapsed;
         GamePanel.Visibility = Visibility.Visible;
 
+        if (MusicCheckBox.IsChecked == true)
+        {
+            backgroundMusicPlayer.Play();
+        }
+
         StartNewGame();
         Keyboard.Focus(this);
     }
@@ -67,6 +74,7 @@ public partial class MainWindow : Window
     private void BackToMenuButton_Click(object sender, RoutedEventArgs e)
     {
         gameTimer.Stop();
+        backgroundMusicPlayer.Stop();
         isGameRunning = false;
 
         GamePanel.Visibility = Visibility.Collapsed;
@@ -121,6 +129,7 @@ public partial class MainWindow : Window
 
         Point currentHead = snake[0];
         Point newHead = GetNewHeadPosition(currentHead);
+
         bool willEatFood = newHead == foodPosition;
 
         if (HasHitWall(newHead) || HasHitSnake(newHead, willEatFood))
@@ -147,22 +156,14 @@ public partial class MainWindow : Window
 
     private Point GetNewHeadPosition(Point currentHead)
     {
-        if (currentDirection == Direction.Up)
+        return currentDirection switch
         {
-            return new Point(currentHead.X, currentHead.Y - 1);
-        }
-
-        if (currentDirection == Direction.Down)
-        {
-            return new Point(currentHead.X, currentHead.Y + 1);
-        }
-
-        if (currentDirection == Direction.Left)
-        {
-            return new Point(currentHead.X - 1, currentHead.Y);
-        }
-
-        return new Point(currentHead.X + 1, currentHead.Y);
+            Direction.Up => new Point(currentHead.X, currentHead.Y - 1),
+            Direction.Down => new Point(currentHead.X, currentHead.Y + 1),
+            Direction.Left => new Point(currentHead.X - 1, currentHead.Y),
+            Direction.Right => new Point(currentHead.X + 1, currentHead.Y),
+            _ => currentHead
+        };
     }
 
     private bool HasHitWall(Point head)
@@ -177,6 +178,7 @@ public partial class MainWindow : Window
     {
         int numberOfBodyPartsToCheck = snake.Count;
 
+        // Khi rắn không ăn, đuôi sẽ di chuyển đi nên được phép bước vào ô đuôi cũ.
         if (!willEatFood)
         {
             numberOfBodyPartsToCheck--;
@@ -213,6 +215,7 @@ public partial class MainWindow : Window
     private void DrawGame()
     {
         GameCanvas.Children.Clear();
+
         DrawFood();
 
         for (int index = 0; index < snake.Count; index++)
@@ -372,5 +375,6 @@ public partial class MainWindow : Window
     private void Window_Closed(object? sender, EventArgs e)
     {
         gameTimer.Stop();
+        backgroundMusicPlayer.Stop();
     }
 }
