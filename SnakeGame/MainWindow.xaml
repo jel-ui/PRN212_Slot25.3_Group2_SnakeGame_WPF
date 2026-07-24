@@ -61,7 +61,8 @@
                        HorizontalAlignment="Center"
                        Margin="0,0,0,10" />
 
-            <Button Content="Bắt đầu"
+            <Button x:Name="StartButton"
+                    Content="Bắt đầu"
                     Width="150"
                     Height="42"
                     FontSize="17"

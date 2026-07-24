@@ -3,6 +3,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
+using Ellipse = System.Windows.Shapes.Ellipse;
 
 namespace SnakeGame;
 
@@ -13,10 +14,13 @@ public partial class MainWindow : Window
     private const int NumberOfRows = 25;
 
     private readonly List<Point> snake = new();
+    private readonly Random random = new();
     private readonly DispatcherTimer gameTimer = new();
 
+    private Point foodPosition;
     private Direction currentDirection = Direction.Right;
     private Direction nextDirection = Direction.Right;
+    private int score;
     private bool isGameRunning;
 
     public MainWindow()
@@ -40,10 +44,15 @@ public partial class MainWindow : Window
 
         currentDirection = Direction.Right;
         nextDirection = Direction.Right;
+        score = 0;
         isGameRunning = true;
 
-        MessageText.Text = "Điều khiển bằng phím mũi tên hoặc W, A, S, D.";
-        DrawSnake();
+        CreateFood();
+        UpdateScoreText();
+
+        MessageText.Text = "Ăn thức ăn màu đỏ và đừng va vào tường!";
+        StartButton.Content = "Chơi lại";
+        DrawGame();
 
         gameTimer.Start();
         Keyboard.Focus(this);
@@ -54,10 +63,28 @@ public partial class MainWindow : Window
         currentDirection = nextDirection;
 
         Point newHead = GetNewHeadPosition(snake[0]);
-        snake.Insert(0, newHead);
-        snake.RemoveAt(snake.Count - 1);
+        bool willEatFood = newHead == foodPosition;
 
-        DrawSnake();
+        if (HasHitWall(newHead) || HasHitSnake(newHead, willEatFood))
+        {
+            EndGame();
+            return;
+        }
+
+        snake.Insert(0, newHead);
+
+        if (willEatFood)
+        {
+            score++;
+            CreateFood();
+            UpdateScoreText();
+        }
+        else
+        {
+            snake.RemoveAt(snake.Count - 1);
+        }
+
+        DrawGame();
     }
 
     private Point GetNewHeadPosition(Point currentHead)
@@ -82,31 +109,59 @@ public partial class MainWindow : Window
             newX++;
         }
 
-        // Ở phiên bản chuyển động đầu tiên, rắn đi xuyên qua mép bàn.
-        if (newX < 0)
-        {
-            newX = NumberOfColumns - 1;
-        }
-        else if (newX >= NumberOfColumns)
-        {
-            newX = 0;
-        }
-
-        if (newY < 0)
-        {
-            newY = NumberOfRows - 1;
-        }
-        else if (newY >= NumberOfRows)
-        {
-            newY = 0;
-        }
-
         return new Point(newX, newY);
     }
 
-    private void DrawSnake()
+    private bool HasHitWall(Point head)
+    {
+        return head.X < 0
+               || head.X >= NumberOfColumns
+               || head.Y < 0
+               || head.Y >= NumberOfRows;
+    }
+
+    private bool HasHitSnake(Point head, bool willEatFood)
+    {
+        int numberOfBodyPartsToCheck = snake.Count;
+
+        // Khi không ăn, ô đuôi sẽ rời đi nên đầu được phép bước vào ô đuôi cũ.
+        if (!willEatFood)
+        {
+            numberOfBodyPartsToCheck--;
+        }
+
+        for (int index = 0; index < numberOfBodyPartsToCheck; index++)
+        {
+            if (snake[index] == head)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private void CreateFood()
+    {
+        if (snake.Count == NumberOfColumns * NumberOfRows)
+        {
+            EndGame();
+            return;
+        }
+
+        do
+        {
+            int column = random.Next(0, NumberOfColumns);
+            int row = random.Next(0, NumberOfRows);
+            foodPosition = new Point(column, row);
+        }
+        while (snake.Contains(foodPosition));
+    }
+
+    private void DrawGame()
     {
         GameCanvas.Children.Clear();
+        DrawFood();
 
         for (int index = 0; index < snake.Count; index++)
         {
@@ -114,6 +169,20 @@ public partial class MainWindow : Window
             Brush color = index == 0 ? Brushes.LimeGreen : Brushes.ForestGreen;
             DrawCell(snakePart, color);
         }
+    }
+
+    private void DrawFood()
+    {
+        Ellipse food = new()
+        {
+            Width = CellSize - 4,
+            Height = CellSize - 4,
+            Fill = Brushes.OrangeRed
+        };
+
+        Canvas.SetLeft(food, foodPosition.X * CellSize + 2);
+        Canvas.SetTop(food, foodPosition.Y * CellSize + 2);
+        GameCanvas.Children.Add(food);
     }
 
     private void DrawCell(Point position, Brush color)
@@ -145,6 +214,18 @@ public partial class MainWindow : Window
         Canvas.SetLeft(welcomeText, 175);
         Canvas.SetTop(welcomeText, 190);
         GameCanvas.Children.Add(welcomeText);
+    }
+
+    private void EndGame()
+    {
+        gameTimer.Stop();
+        isGameRunning = false;
+        MessageText.Text = $"Kết thúc! Bạn đạt {score} điểm.";
+    }
+
+    private void UpdateScoreText()
+    {
+        ScoreText.Text = $"Điểm: {score}";
     }
 
     private void Window_PreviewKeyDown(object sender, KeyEventArgs e)
